@@ -86,6 +86,23 @@ def is_in_plane(normal, point, d=0):
 def portfolio_return(weights, returns):
     assert abs(sum(weights) - 1.0) < 1e-10
     return dot_product(weights, returns)
+
+def matrix_multiply(A, B):
+    assert len(A[0]) == len(B)
+    result = [[0 for j in range(len(B[0]))] for i in range(len(A))]
+    for i in range(len(A)):
+        for j in range(len(B[0])):
+            for k in range(len(B)):
+                result[i][j] += A[i][k] * B[k][j]
+    return result
+
+def matrix_transpose(A):
+    result = [[0 for j in range(len(A))] for i in range(len(A[0]))]
+
+    for i in range(len(A)):
+        for j in range(len(A[0])):
+            result[j][i] = A[i][j]
+    return result
 if __name__ == "__main__":
     # Test 1: v dotted with itself gives length squared
     v = [3, 4]
@@ -154,3 +171,41 @@ if __name__ == "__main__":
     # portfolio_return test
     print(portfolio_return([0.6, 0.4], [0.03, 0.01]))  # 0.022
     print(portfolio_return([0.5, 0.3, 0.2], [0.04, 0.02, 0.01]))
+
+    #Matrix Multiplication
+    import numpy as np
+
+    A = [[1, 2], [3, 4]]
+    B = [[5, 6], [7, 8]]
+
+    result = matrix_multiply(A, B)
+    numpy_result = np.matmul(A, B).tolist()
+
+    print(f"matrix_multiply: {result}")
+    print(f"numpy result: {numpy_result}")
+    assert result == numpy_result, "Mismatch with NumPy"
+    print("Verified against NumPy")
+
+    # Test non-square
+    A2 = [[1, 2, 3], [4, 5, 6]]
+    B2 = [[7, 8], [9, 10], [11, 12]]
+    result2 = matrix_multiply(A2, B2)
+    print(f"Non-square result: {result2}")
+    assert result2 == np.matmul(A2, B2).tolist()
+    print("Non-square verified")
+
+    # Test identity
+    I = [[1, 0], [0, 1]]
+    v = [[3], [4]]
+    print(f"Identity test: {matrix_multiply(I, v)}")
+
+    A = [[1, 2], [3, 4]]
+    B = [[5, 6], [7, 8]]
+
+    AB_T = matrix_transpose(matrix_multiply(A, B))
+    BT_AT = matrix_multiply(matrix_transpose(B), matrix_transpose(A))
+
+    print(f"(AB)ᵀ: {AB_T}")
+    print(f"BᵀAᵀ: {BT_AT}")
+    assert AB_T == BT_AT
+    print("(AB)ᵀ = BᵀAᵀ verified")
